@@ -1,0 +1,60 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - OverpassCollider
+  - UnderpassCollider
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Racetrack
+    uniqueID: 2943670797
+    locked: 0
+  - name: Skidmarks
+    uniqueID: 2514010177
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: RacetrackOverpass
+    uniqueID: 2705921885
+    locked: 0
+  - name: SkidmarksOverpass
+    uniqueID: 2350172663
+    locked: 0
+  - name: Particles
+    uniqueID: 2971358027
+    locked: 0
