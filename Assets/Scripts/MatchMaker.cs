@@ -102,7 +102,6 @@ using UnityEngine;
     
                 return false;
             }
-            // JEST TO WYSYLANE PRZEZ NAJPIERW PREZ KLIENTA DO CMD POTEM CMD STARTUJE I WYSYLA TU A TO DO SERVERA W PLAYER.CS
             public void BeginGame (string matchID) {
                 for (int i = 0; i < matches.Count; i++) {
                     if (matches[i].matchID == matchID) {

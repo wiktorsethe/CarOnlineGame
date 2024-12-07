@@ -183,16 +183,5 @@ public class MatchNetworkManager : NetworkManager
                 break; // Jeśli znajdziemy scenę, zatrzymujemy dalsze sprawdzanie
             }
         }
-
-        // Wysyłamy flagę do PlayerSceneChecker
-        GameObject player = NetworkClient.localPlayer?.gameObject;
-        if (player != null)
-        {
-            PlayerSceneChecker checker = player.GetComponent<PlayerSceneChecker>();
-            if (checker != null)
-            {
-                checker.CheckScene(targetSceneLoaded);
-            }
-        }
     }
 }

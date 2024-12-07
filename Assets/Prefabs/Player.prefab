@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 7307524007382035525}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -211,7 +211,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: 0, y: -0.010777652}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -222,7 +222,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1, y: 1.7688111}
   m_EdgeRadius: 0
 --- !u!114 &7307524007382035525
 MonoBehaviour:
@@ -236,9 +236,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f8a34a745b9442d7b61e5daf1882c7b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetSceneName: Game
-  carController: {fileID: 2514855556884662127}
-  carObject: {fileID: 5853202172135970288}
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  isCarVisible: 0
+  carSpriteObject: {fileID: 5853202172135970288}
 --- !u!1 &1732870574290343438
 GameObject:
   m_ObjectHideFlags: 0
@@ -5524,7 +5526,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4403316014608909877
 Transform:
   m_ObjectHideFlags: 0
