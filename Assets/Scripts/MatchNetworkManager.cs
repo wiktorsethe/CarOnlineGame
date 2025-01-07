@@ -3,10 +3,11 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Mirror;
+using UnityEngine.Serialization;
 
 public class MatchNetworkManager : NetworkManager
 {
-    public string StartScene;
+    public string startScene;
     public string targetScene;
     
     private string[] scenesToLoad;
@@ -143,7 +144,7 @@ public class MatchNetworkManager : NetworkManager
 
         firstSceneLoaded = false;
         
-        conn.Send(new SceneMessage{ sceneName = StartScene, sceneOperation = SceneOperation.LoadAdditive, customHandling = true});
+        conn.Send(new SceneMessage{ sceneName = startScene, sceneOperation = SceneOperation.LoadAdditive, customHandling = true});
 
         Transform startPos = GetStartPosition();
 
@@ -152,7 +153,7 @@ public class MatchNetworkManager : NetworkManager
         
         yield return new WaitForEndOfFrame();
         
-        SceneManager.MoveGameObjectToScene(player, SceneManager.GetSceneByName(StartScene));
+        SceneManager.MoveGameObjectToScene(player, SceneManager.GetSceneByName(startScene));
 
         NetworkServer.AddPlayerForConnection(conn, player);
     }
@@ -165,7 +166,7 @@ public class MatchNetworkManager : NetworkManager
             yield return null; // Czekamy, aż gracz zostanie dodany
         }
 
-        CheckScenesForTarget();
+        CheckScenesForTarget(); // TODO: PO CO TO??????
     }
     
     // Nowa funkcja do sprawdzania scen

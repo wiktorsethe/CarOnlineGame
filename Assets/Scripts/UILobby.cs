@@ -21,7 +21,7 @@ public class UILobby : MonoBehaviour {
         [SerializeField] Text matchIDText;
         [SerializeField] GameObject beginGameButton;
 
-        GameObject localPlayerLobbyUI;
+        GameObject _localPlayerLobbyUI;
 
         void Start () {
             instance = this;
@@ -47,8 +47,8 @@ public class UILobby : MonoBehaviour {
             if (success) {
                 lobbyCanvas.enabled = true;
 
-                if (localPlayerLobbyUI != null) Destroy (localPlayerLobbyUI);
-                localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
+                if (_localPlayerLobbyUI != null) Destroy (_localPlayerLobbyUI);
+                _localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
                 matchIDText.text = matchID;
             } else {
                 lobbySelectables.ForEach (x => x.interactable = true);
@@ -64,9 +64,8 @@ public class UILobby : MonoBehaviour {
         public void JoinSuccess (bool success, string matchID) {
             if (success) {
                 lobbyCanvas.enabled = true;
-
-                if (localPlayerLobbyUI != null) Destroy (localPlayerLobbyUI);
-                localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
+                if (_localPlayerLobbyUI != null) Destroy (_localPlayerLobbyUI);
+                _localPlayerLobbyUI = SpawnPlayerUIPrefab (Player.localPlayer);
                 matchIDText.text = matchID;
             } else {
                 lobbySelectables.ForEach (x => x.interactable = true);
@@ -74,18 +73,18 @@ public class UILobby : MonoBehaviour {
         }
 
         public void DisconnectGame () {
-            if (localPlayerLobbyUI != null) Destroy (localPlayerLobbyUI);
+            if (_localPlayerLobbyUI != null) Destroy (_localPlayerLobbyUI);
             Player.localPlayer.DisconnectGame ();
 
             lobbyCanvas.enabled = false;
             lobbySelectables.ForEach (x => x.interactable = true);
         }
 
-        public GameObject SpawnPlayerUIPrefab (Player player) {
+        public GameObject SpawnPlayerUIPrefab (Player player)
+        {
             GameObject newUIPlayer = Instantiate (UIPlayerPrefab, UIPlayerParent);
             newUIPlayer.GetComponent<UIPlayer> ().SetPlayer (player);
             newUIPlayer.transform.SetSiblingIndex (player.playerIndex - 1);
-
             return newUIPlayer;
         }
 

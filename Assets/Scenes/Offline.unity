@@ -254,7 +254,7 @@ MonoBehaviour:
   evaluationMethod: 0
   evaluationInterval: 3
   timeInterpolationGui: 0
-  StartScene: Lobby
+  startScene: Lobby
   targetScene: Game
 --- !u!114 &36484300
 MonoBehaviour:

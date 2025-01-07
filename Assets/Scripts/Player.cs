@@ -38,7 +38,8 @@ using UnityEngine.SceneManagement;
         public override void OnStartClient () {
             if (isLocalPlayer) {
                 localPlayer = this;
-            } else {
+            } 
+            else {
                 Debug.Log ($"Spawning other player UI Prefab");
                 playerLobbyUI = UILobby.instance.SpawnPlayerUIPrefab (this);
             }

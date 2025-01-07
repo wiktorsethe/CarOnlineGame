@@ -1,4 +1,5 @@
 using Mirror;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -58,6 +59,15 @@ public class PlayerSceneChecker : NetworkBehaviour
         {
             Debug.Log("Game Scene detected, enabling carSpriteObject");
             SetCarVisibility(true);
+            foreach (var obj in scene.GetRootGameObjects())
+            {
+                RaceController raceController = obj.GetComponent<RaceController>();
+                if (raceController != null)
+                {
+                    raceController.RegisterPlayer(gameObject);
+                    Debug.Log(raceController + " registered: " + gameObject);
+                }
+            }
         }
         else if (scene.name == "Lobby")
         {

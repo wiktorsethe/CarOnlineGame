@@ -1,30 +1,27 @@
-using System.Collections;
 using System.Collections.Generic;
-using Mirror;
 using UnityEngine;
 
-public class RaceController : NetworkBehaviour
+public class RaceController : MonoBehaviour
 {
-    public List<GameObject> RegisteredPlayers = new List<GameObject>();
+    public List<GameObject> registeredPlayers = new List<GameObject>();
     
     public void RegisterPlayer(GameObject player)
     {
-        if (!isServer) return;
+        Debug.Log($"Wywołanie RegisterPlayer przez {gameObject.name}.");
 
-        if (!RegisteredPlayers.Contains(player))
+        if (!registeredPlayers.Contains(player))
         {
-            RegisteredPlayers.Add(player);
+            registeredPlayers.Add(player);
             Debug.Log($"Gracz {player.name} zarejestrowany w wyścigu.");
         }
     }
+
     
     public void UnregisterPlayer(GameObject player)
     {
-        if (!isServer) return;
-
-        if (RegisteredPlayers.Contains(player))
+        if (registeredPlayers.Contains(player))
         {
-            RegisteredPlayers.Remove(player);
+            registeredPlayers.Remove(player);
             Debug.Log($"Gracz {player.name} opuścił wyścig.");
         }
     }

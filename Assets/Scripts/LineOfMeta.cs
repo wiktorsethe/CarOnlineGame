@@ -1,8 +1,17 @@
+using System;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LineOfMeta : NetworkBehaviour
 {
+    [SerializeField] private RaceController raceController;
+
+    private void Start()
+    {
+        raceController = FindObjectOfType(typeof(RaceController)) as RaceController;
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         // Sprawdź, czy obiekt, który wjechał w trigger, to gracz
@@ -10,6 +19,7 @@ public class LineOfMeta : NetworkBehaviour
         {
             // Wywołaj komendę na serwerze, aby wyłączyć skrypt wszystkim graczom
             CmdDisableCarControllers();
+            
         }
     }
 
