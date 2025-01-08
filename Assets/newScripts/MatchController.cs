@@ -1,12 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Mirror.Examples.MultipleMatches.Scripts;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Mirror.Examples.MultipleMatch
-{
-    [RequireComponent(typeof(NetworkMatch))]
+[RequireComponent(typeof(NetworkMatch))]
     public class MatchController : NetworkBehaviour
     {
         internal readonly SyncDictionary<NetworkIdentity, MatchPlayerData> matchPlayerData = new SyncDictionary<NetworkIdentity, MatchPlayerData>();
@@ -310,4 +308,3 @@ namespace Mirror.Examples.MultipleMatch
             canvasController.OnMatchEnded();
         }
     }
-}

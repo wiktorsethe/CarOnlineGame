@@ -2,13 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Mirror.Examples.MultipleMatches.Scripts;
+using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Mirror.Examples.MultipleMatch
-{
-    public class CanvasController : MonoBehaviour
+public class CanvasController : MonoBehaviour
     {
         /// <summary>
         /// Match Controllers listen for this to terminate their match and clean up
@@ -204,7 +202,7 @@ namespace Mirror.Examples.MultipleMatch
         }
 
         /// <summary>
-        /// Called from <see cref="MatchController.RpcExitGame"/>
+        /// Called from <see cref="newScripts.MatchController.RpcExitGame"/>
         /// </summary>
         [ClientCallback]
         public void OnMatchEnded()
@@ -648,4 +646,3 @@ namespace Mirror.Examples.MultipleMatch
 
         #endregion
     }
-}

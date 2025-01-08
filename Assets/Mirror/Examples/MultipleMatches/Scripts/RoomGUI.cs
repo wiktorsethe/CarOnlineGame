@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Mirror.Examples.MultipleMatches.Scripts;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Mirror.Examples.MultipleMatch
