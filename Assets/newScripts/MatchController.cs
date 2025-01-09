@@ -8,9 +8,9 @@ using UnityEngine.UI;
     public class MatchController : NetworkBehaviour
     {
         internal readonly SyncDictionary<NetworkIdentity, MatchPlayerData> matchPlayerData = new SyncDictionary<NetworkIdentity, MatchPlayerData>();
-        internal readonly Dictionary<CellValue, CellGUI> MatchCells = new Dictionary<CellValue, CellGUI>();
+        //internal readonly Dictionary<CellValue, CellGUI> MatchCells = new Dictionary<CellValue, CellGUI>();
 
-        CellValue boardScore = CellValue.None;
+        //CellValue boardScore = CellValue.None;
         bool playAgain = false;
 
         [Header("GUI References")]
@@ -18,8 +18,6 @@ using UnityEngine.UI;
         public Text gameText;
         public Button exitButton;
         public Button playAgainButton;
-        public Text winCountLocal;
-        public Text winCountOpponent;
 
         [Header("Diagnostics")]
         [ReadOnly, SerializeField] internal CanvasController canvasController;
@@ -68,7 +66,7 @@ using UnityEngine.UI;
         [ClientCallback]
         public void UpdateGameUI(NetworkIdentity _, NetworkIdentity newPlayerTurn)
         {
-            if (!newPlayerTurn) return;
+            /*if (!newPlayerTurn) return;
 
             if (newPlayerTurn.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
@@ -79,19 +77,10 @@ using UnityEngine.UI;
             {
                 gameText.text = "Their Turn";
                 gameText.color = Color.red;
-            }
+            }*/
         }
 
-        [ClientCallback]
-        public void UpdateWins(SyncDictionary<NetworkIdentity, MatchPlayerData>.Operation op, NetworkIdentity key, MatchPlayerData matchPlayerData)
-        {
-            if (key.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
-                winCountLocal.text = $"Player {matchPlayerData.playerIndex}\n{matchPlayerData.wins}";
-            else
-                winCountOpponent.text = $"Player {matchPlayerData.playerIndex}\n{matchPlayerData.wins}";
-        }
-
-        [Command(requiresAuthority = false)]
+        /*[Command(requiresAuthority = false)]
         public void CmdMakePlay(CellValue cellValue, NetworkConnectionToClient sender = null)
         {
             // If wrong player or cell already taken, ignore
@@ -125,9 +114,9 @@ using UnityEngine.UI;
                 currentPlayer = currentPlayer == player1 ? player2 : player1;
             }
 
-        }
+        }*/
 
-        [ServerCallback]
+        /*[ServerCallback]
         bool CheckWinner(CellValue currentScore)
         {
             if ((currentScore & CellValue.TopRow) == CellValue.TopRow)
@@ -148,19 +137,19 @@ using UnityEngine.UI;
                 return true;
 
             return false;
-        }
+        }*/
 
-        [ClientRpc]
+        /*[ClientRpc]
         public void RpcUpdateCell(CellValue cellValue, NetworkIdentity player)
         {
             MatchCells[cellValue].SetPlayer(player);
-        }
+        }*/
 
         [ClientRpc]
         public void RpcShowWinner(NetworkIdentity winner)
         {
-            foreach (CellGUI cellGUI in MatchCells.Values)
-                cellGUI.GetComponent<Button>().interactable = false;
+            /*foreach (CellGUI cellGUI in MatchCells.Values)
+                cellGUI.GetComponent<Button>().interactable = false;*/
 
             if (winner == null)
             {
@@ -205,10 +194,10 @@ using UnityEngine.UI;
         [ServerCallback]
         public void RestartGame()
         {
-            foreach (CellGUI cellGUI in MatchCells.Values)
-                cellGUI.SetPlayer(null);
+            /*foreach (CellGUI cellGUI in MatchCells.Values)
+                cellGUI.SetPlayer(null);*/
 
-            boardScore = CellValue.None;
+            //boardScore = CellValue.None;
 
             NetworkIdentity[] keys = new NetworkIdentity[matchPlayerData.Keys.Count];
             matchPlayerData.Keys.CopyTo(keys, 0);
@@ -229,8 +218,8 @@ using UnityEngine.UI;
         [ClientRpc]
         public void RpcRestartGame()
         {
-            foreach (CellGUI cellGUI in MatchCells.Values)
-                cellGUI.SetPlayer(null);
+            /*foreach (CellGUI cellGUI in MatchCells.Values)
+                cellGUI.SetPlayer(null);*/
 
             exitButton.gameObject.SetActive(false);
             playAgainButton.gameObject.SetActive(false);
