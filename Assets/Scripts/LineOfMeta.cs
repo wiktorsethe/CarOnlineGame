@@ -1,16 +1,9 @@
-using System;
 using Mirror;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 public class LineOfMeta : NetworkBehaviour
 {
-    [SerializeField] private RaceController raceController;
-
-    private void Start()
-    {
-        raceController = FindObjectOfType(typeof(RaceController)) as RaceController;
-    }
+    [SerializeField] private MatchController matchController;
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -18,28 +11,11 @@ public class LineOfMeta : NetworkBehaviour
         if (collision.CompareTag("Player"))
         {
             // Wywołaj komendę na serwerze, aby wyłączyć skrypt wszystkim graczom
-            CmdDisableCarControllers();
+            matchController.CmdDisablePlayerCars();
             
-        }
-    }
-
-    [Command(requiresAuthority = false)]
-    private void CmdDisableCarControllers()
-    {
-        // Wywołaj RPC, aby wyłączyć skrypt na wszystkich klientach
-        RpcDisableCarControllers();
-    }
-
-    [ClientRpc]
-    private void RpcDisableCarControllers()
-    {
-        // Znajdź wszystkie obiekty graczy i wyłącz CarController
-        foreach (var player in FindObjectsOfType<CarController>())
-        {
-            if (player!= null)
-            {
-                player.enabled = false;
-            }
+            //TODO: DODAC ODWOLANIE DO MATCHCONTROLLER ZEBY WYWOLYWAL GUZIKI POWROTU I RESTARTU 
+            NetworkIdentity playerIdentity = collision.GetComponent<NetworkIdentity>();
+            matchController.CmdShowWinner(playerIdentity);
         }
     }
 }

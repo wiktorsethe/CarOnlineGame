@@ -1,5 +1,6 @@
 ﻿using System;
 using Mirror;
+using UnityEngine;
 
 /// <summary>
     /// Match message to be sent to the server
@@ -49,6 +50,7 @@ using Mirror;
         public int playerIndex;
         public int wins;
         public CellValue currentScore;
+        public CarController carController;
     }
 
     /// <summary>

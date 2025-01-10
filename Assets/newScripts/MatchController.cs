@@ -24,6 +24,9 @@ using UnityEngine.UI;
         [ReadOnly, SerializeField] internal NetworkIdentity player1;
         [ReadOnly, SerializeField] internal NetworkIdentity player2;
         [ReadOnly, SerializeField] internal NetworkIdentity startingPlayer;
+        
+        public Transform player1SpawnPoint; 
+        public Transform player2SpawnPoint;
 
         [SyncVar(hook = nameof(UpdateGameUI))]
         [ReadOnly, SerializeField] internal NetworkIdentity currentPlayer;
@@ -49,8 +52,18 @@ using UnityEngine.UI;
         {
             yield return null;
 
-            matchPlayerData.Add(player1, new MatchPlayerData { playerIndex = CanvasController.playerInfos[player1.connectionToClient].playerIndex });
-            matchPlayerData.Add(player2, new MatchPlayerData { playerIndex = CanvasController.playerInfos[player2.connectionToClient].playerIndex });
+            matchPlayerData.Add(player1, new MatchPlayerData
+            {
+                playerIndex = CanvasController.playerInfos[player1.connectionToClient].playerIndex,
+                carController = player1.GetComponent<CarController>()
+            });
+            matchPlayerData.Add(player2, new MatchPlayerData
+            {
+                playerIndex = CanvasController.playerInfos[player2.connectionToClient].playerIndex,
+                carController = player2.GetComponent<CarController>()
+            });
+
+            RpcStartCountdown();
         }
 
         public override void OnStartClient()
@@ -61,6 +74,64 @@ using UnityEngine.UI;
 
             exitButton.gameObject.SetActive(false);
             playAgainButton.gameObject.SetActive(false);
+        }
+        
+        [ClientRpc]
+        private void RpcStartCountdown()
+        {
+            StartCoroutine(StartCountdown());
+        }
+        
+        private IEnumerator StartCountdown()
+        {
+            gameText.text = "3";
+            gameText.color = Color.white;
+            yield return new WaitForSeconds(1f);
+
+            gameText.text = "2";
+            yield return new WaitForSeconds(1f);
+
+            gameText.text = "1";
+            yield return new WaitForSeconds(1f);
+
+            gameText.text = "Start!";
+            gameText.color = Color.green;
+            yield return new WaitForSeconds(1f);
+
+            CmdEnablePlayerCars();
+            
+            gameText.text = ""; // Ukryj tekst po odliczaniu
+        }
+        
+        [Command(requiresAuthority = false)]
+        private void CmdEnablePlayerCars()
+        {
+            RpcEnablePlayerCars();
+        }
+        
+        [ClientRpc]
+        private void RpcEnablePlayerCars()
+        {
+            foreach (var player in matchPlayerData)
+            {
+                player.Value.carController.enabled = true;
+            }
+        }
+        
+        [Command(requiresAuthority = false)]
+        public void CmdDisablePlayerCars()
+        {
+            RpcDisablePlayerCars();
+        }
+        
+        [ClientRpc]
+        private void RpcDisablePlayerCars()
+        {
+            foreach (var player in matchPlayerData)
+            {
+                player.Value.carController.enabled = false;
+                player.Value.carController.StopCar();
+            }
         }
 
         [ClientCallback]
@@ -145,6 +216,11 @@ using UnityEngine.UI;
             MatchCells[cellValue].SetPlayer(player);
         }*/
 
+        [Command(requiresAuthority = false)]
+        public void CmdShowWinner(NetworkIdentity winner)
+        {
+            RpcShowWinner(winner);
+        }
         [ClientRpc]
         public void RpcShowWinner(NetworkIdentity winner)
         {

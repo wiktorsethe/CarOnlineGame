@@ -486,24 +486,30 @@ public class CanvasController : MonoBehaviour
             Guid matchId;
             if (playerMatches.TryGetValue(conn, out matchId))
             {
-                //GameObject matchControllerObject = Instantiate(matchControllerPrefab);
-                //matchControllerObject.GetComponent<NetworkMatch>().matchId = matchId;
-                //NetworkServer.Spawn(matchControllerObject);
+                GameObject matchControllerObject = Instantiate(matchControllerPrefab);
+                matchControllerObject.GetComponent<NetworkMatch>().matchId = matchId;
+                NetworkServer.Spawn(matchControllerObject);
 
-                //MatchController matchController = matchControllerObject.GetComponent<MatchController>();
+                MatchController matchController = matchControllerObject.GetComponent<MatchController>();
 
                 foreach (NetworkConnectionToClient playerConn in matchConnections[matchId])
                 {
                     playerConn.Send(new ClientMatchMessage { clientMatchOperation = ClientMatchOperation.Started });
 
+                    //TODO: SET PLAYER POSITIONS ON START OF MATCH
+                    
                     GameObject player = Instantiate(NetworkManager.singleton.playerPrefab);
                     player.GetComponent<NetworkMatch>().matchId = matchId;
                     NetworkServer.AddPlayerForConnection(playerConn, player);
 
-                    /*if (matchController.player1 == null)
+                    if (matchController.player1 == null)
+                    {
                         matchController.player1 = playerConn.identity;
+                    }
                     else
-                        matchController.player2 = playerConn.identity;*/
+                    {
+                        matchController.player2 = playerConn.identity;
+                    }
 
                     /* Reset ready state for after the match. */
                     PlayerInfo playerInfo = playerInfos[playerConn];
@@ -511,18 +517,18 @@ public class CanvasController : MonoBehaviour
                     playerInfos[playerConn] = playerInfo;
                 }
 
-                //matchController.startingPlayer = matchController.player1;
-                //matchController.currentPlayer = matchController.player1;
+                matchController.startingPlayer = matchController.player1;
+                matchController.currentPlayer = matchController.player1;
 
                 playerMatches.Remove(conn);
                 openMatches.Remove(matchId);
                 matchConnections.Remove(matchId);
                 SendMatchList();
 
-                //OnPlayerDisconnected += matchController.OnPlayerDisconnected;
+                OnPlayerDisconnected += matchController.OnPlayerDisconnected;
             }
         }
-
+        
         /// <summary>
         /// Sends updated match list to all waiting connections or just one if specified
         /// </summary>

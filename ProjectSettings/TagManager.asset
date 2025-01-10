@@ -8,6 +8,7 @@ TagManager:
   - UnderpassCollider
   - OverpassTrigger
   - UnderpassTrigger
+  - MetaLine
   layers:
   - Default
   - TransparentFX

@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/NewScene.unity
     guid: ef6b4500ba0314f048f6008752a0b797
+  - enabled: 0
+    path: Assets/Mirror/Examples/MultipleMatches/Scenes/MirrorMultipleMatches.unity
+    guid: aa1f875396fa7d348a782cebc2f75d7c
   m_configObjects: {}

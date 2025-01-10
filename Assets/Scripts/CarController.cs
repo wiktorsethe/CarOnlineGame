@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Mirror;
 using Cinemachine;
@@ -313,5 +314,21 @@ public class CarController : NetworkBehaviour
         }
 
         return false;
+    }
+    
+    public void StopCar()
+    {
+       StartCoroutine(StopCarCoroutine());
+    }
+
+    IEnumerator StopCarCoroutine()
+    {
+        yield return new WaitForSeconds(1.5f);
+        
+        if (rb != null)
+        {
+            rb.velocity = Vector2.zero;
+            rb.angularVelocity = 0f;
+        }
     }
 }

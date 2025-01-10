@@ -171,13 +171,13 @@ MonoBehaviour:
   gameText: {fileID: 3623013869500637742}
   exitButton: {fileID: 3578082239447023245}
   playAgainButton: {fileID: 505721148531914274}
-  winCountLocal: {fileID: 0}
-  winCountOpponent: {fileID: 0}
   canvasController: {fileID: 0}
   player1: {fileID: 0}
   player2: {fileID: 0}
   startingPlayer: {fileID: 0}
   currentPlayer: {fileID: 0}
+  playerSpawnPoints:
+  - {fileID: 0}
 --- !u!1 &3002539098384373397
 GameObject:
   m_ObjectHideFlags: 0
