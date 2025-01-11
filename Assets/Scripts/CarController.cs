@@ -67,6 +67,7 @@ public class CarController : NetworkBehaviour
             if (particle != null)
             {
                 var particleEmission = particle.emission;
+                particleEmission.enabled = true;
                 particleEmission.rateOverTime = 0;
             }
         }
@@ -231,6 +232,7 @@ public class CarController : NetworkBehaviour
             if (particle != null)
             {
                 var particleEmission = particle.emission;
+                particleEmission.enabled = true;
                 particleEmission.rateOverTime = rate;
             }
         }
@@ -334,5 +336,37 @@ public class CarController : NetworkBehaviour
         _velocityVsUp = 0f;
         _rotationAngle = 0f;
         _steeringInput = 0f;
+        
+        CmdStopAllParticlesAndTrailRenderers();
+    }
+
+    [Command(requiresAuthority = false)]
+    private void CmdStopAllParticlesAndTrailRenderers()
+    {
+        RpcStopAllParticlesAndTrailRenderers();
+    }
+
+    [ClientRpc]
+    private void RpcStopAllParticlesAndTrailRenderers()
+    {
+        
+        foreach (var trail in trailRenderers)
+        {
+            trail.emitting = false;
+            trail.Clear();
+        }
+
+        foreach (var trail in overpassTrailRenderers)
+        {
+            trail.emitting = false;
+            trail.Clear();
+        }
+
+        foreach (var particle in particleSystems)
+        {
+            var particleEmission = particle.emission;
+            particleEmission.enabled = false;
+            particle.Clear();
+        }
     }
 }

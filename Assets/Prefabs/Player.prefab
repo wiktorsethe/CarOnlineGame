@@ -32,7 +32,7 @@ Transform:
   m_GameObject: {fileID: 1674923237291508670}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2.5, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4403316014608909877}
@@ -92,9 +92,15 @@ MonoBehaviour:
   turnFactor: 3.5
   maxSpeed: 20
   virtualCamera: {fileID: 0}
-  trailRenderers: []
-  overpassTrailRenderers: []
-  particleSystems: []
+  trailRenderers:
+  - {fileID: 6902814082345960493}
+  - {fileID: 4629049873294724927}
+  overpassTrailRenderers:
+  - {fileID: 6108052577535600806}
+  - {fileID: 3397231529229676989}
+  particleSystems:
+  - {fileID: 6578616093533657548}
+  - {fileID: 6978020386997403488}
   isTireScreeching: 0
   particleEmissionRate: 0
   isOverpassEmitter: 0
