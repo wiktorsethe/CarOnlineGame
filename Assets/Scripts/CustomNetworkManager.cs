@@ -3,7 +3,7 @@ using UnityEngine;
 using Mirror;
 
 [AddComponentMenu("")]
-    public class CustNetworkManager : NetworkManager
+    public class CustomNetworkManager : NetworkManager
     {
         [Header("Match GUI")]
         public GameObject canvas;

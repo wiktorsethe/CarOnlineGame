@@ -534,9 +534,6 @@ public class CanvasController : MonoBehaviour
                     playerInfos[playerConn] = playerInfo;
                 }
 
-                matchController.startingPlayer = matchController.player1;
-                matchController.currentPlayer = matchController.player1;
-
                 playerMatches.Remove(conn);
                 openMatches.Remove(matchId);
                 matchConnections.Remove(matchId);

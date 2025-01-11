@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,9 +7,7 @@ using UnityEngine.UI;
     public class MatchController : NetworkBehaviour
     {
         internal readonly SyncDictionary<NetworkIdentity, MatchPlayerData> matchPlayerData = new SyncDictionary<NetworkIdentity, MatchPlayerData>();
-        //internal readonly Dictionary<CellValue, CellGUI> MatchCells = new Dictionary<CellValue, CellGUI>();
 
-        //CellValue boardScore = CellValue.None;
         bool playAgain = false;
 
         [Header("GUI References")]
@@ -23,11 +20,7 @@ using UnityEngine.UI;
         [ReadOnly, SerializeField] internal CanvasController canvasController;
         [ReadOnly, SerializeField] internal NetworkIdentity player1;
         [ReadOnly, SerializeField] internal NetworkIdentity player2;
-        [ReadOnly, SerializeField] internal NetworkIdentity startingPlayer;
         
-        [SyncVar(hook = nameof(UpdateGameUI))]
-        [ReadOnly, SerializeField] internal NetworkIdentity currentPlayer;
-
         [Header("Player Starting Positions")]
         public Vector3[] startingPositions = new Vector3[]
         {
@@ -36,12 +29,7 @@ using UnityEngine.UI;
         };
         void Awake()
         {
-#if UNITY_2022_2_OR_NEWER
-            canvasController = GameObject.FindAnyObjectByType<CanvasController>();
-#else
-            // Deprecated in Unity 2023.1
             canvasController = GameObject.FindObjectOfType<CanvasController>();
-#endif
         }
 
         public override void OnStartServer()
@@ -99,10 +87,11 @@ using UnityEngine.UI;
 
             gameText.text = "Start!";
             gameText.color = Color.green;
+            
+            CmdEnablePlayerCars();
+
             yield return new WaitForSeconds(1f);
 
-            CmdEnablePlayerCars();
-            
             gameText.text = ""; // Ukryj tekst po odliczaniu
         }
         
@@ -137,88 +126,6 @@ using UnityEngine.UI;
             }
         }
 
-        [ClientCallback]
-        public void UpdateGameUI(NetworkIdentity _, NetworkIdentity newPlayerTurn)
-        {
-            /*if (!newPlayerTurn) return;
-
-            if (newPlayerTurn.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
-            {
-                gameText.text = "Your Turn";
-                gameText.color = Color.blue;
-            }
-            else
-            {
-                gameText.text = "Their Turn";
-                gameText.color = Color.red;
-            }*/
-        }
-
-        /*[Command(requiresAuthority = false)]
-        public void CmdMakePlay(CellValue cellValue, NetworkConnectionToClient sender = null)
-        {
-            // If wrong player or cell already taken, ignore
-            if (sender.identity != currentPlayer || MatchCells[cellValue].playerIdentity != null)
-                return;
-
-            MatchCells[cellValue].playerIdentity = currentPlayer;
-            RpcUpdateCell(cellValue, currentPlayer);
-
-            MatchPlayerData mpd = matchPlayerData[currentPlayer];
-            mpd.currentScore = mpd.currentScore | cellValue;
-            matchPlayerData[currentPlayer] = mpd;
-
-            boardScore |= cellValue;
-
-            if (CheckWinner(mpd.currentScore))
-            {
-                mpd.wins += 1;
-                matchPlayerData[currentPlayer] = mpd;
-                RpcShowWinner(currentPlayer);
-                currentPlayer = null;
-            }
-            else if (boardScore == CellValue.Full)
-            {
-                RpcShowWinner(null);
-                currentPlayer = null;
-            }
-            else
-            {
-                // Set currentPlayer SyncVar so clients know whose turn it is
-                currentPlayer = currentPlayer == player1 ? player2 : player1;
-            }
-
-        }*/
-
-        /*[ServerCallback]
-        bool CheckWinner(CellValue currentScore)
-        {
-            if ((currentScore & CellValue.TopRow) == CellValue.TopRow)
-                return true;
-            if ((currentScore & CellValue.MidRow) == CellValue.MidRow)
-                return true;
-            if ((currentScore & CellValue.BotRow) == CellValue.BotRow)
-                return true;
-            if ((currentScore & CellValue.LeftCol) == CellValue.LeftCol)
-                return true;
-            if ((currentScore & CellValue.MidCol) == CellValue.MidCol)
-                return true;
-            if ((currentScore & CellValue.RightCol) == CellValue.RightCol)
-                return true;
-            if ((currentScore & CellValue.Diag1) == CellValue.Diag1)
-                return true;
-            if ((currentScore & CellValue.Diag2) == CellValue.Diag2)
-                return true;
-
-            return false;
-        }*/
-
-        /*[ClientRpc]
-        public void RpcUpdateCell(CellValue cellValue, NetworkIdentity player)
-        {
-            MatchCells[cellValue].SetPlayer(player);
-        }*/
-
         [Command(requiresAuthority = false)]
         public void CmdShowWinner(NetworkIdentity winner)
         {
@@ -227,9 +134,6 @@ using UnityEngine.UI;
         [ClientRpc]
         public void RpcShowWinner(NetworkIdentity winner)
         {
-            /*foreach (CellGUI cellGUI in MatchCells.Values)
-                cellGUI.GetComponent<Button>().interactable = false;*/
-
             if (winner.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 gameText.text = "Winner!";
@@ -254,7 +158,7 @@ using UnityEngine.UI;
         }
 
         [Command(requiresAuthority = false)]
-        public void CmdPlayAgain(NetworkConnectionToClient sender = null)
+        private void CmdPlayAgain()
         {
             if (!playAgain)
                 playAgain = true;
@@ -268,18 +172,12 @@ using UnityEngine.UI;
         [ServerCallback]
         public void RestartGame()
         {
-            /*foreach (CellGUI cellGUI in MatchCells.Values)
-                cellGUI.SetPlayer(null);*/
-
-            //boardScore = CellValue.None;
-
             NetworkIdentity[] keys = new NetworkIdentity[matchPlayerData.Keys.Count];
             matchPlayerData.Keys.CopyTo(keys, 0);
 
             foreach (NetworkIdentity identity in keys)
             {
                 MatchPlayerData mpd = matchPlayerData[identity];
-                mpd.currentScore = CellValue.None;
                 matchPlayerData[identity] = mpd;
             }
 
@@ -287,18 +185,12 @@ using UnityEngine.UI;
             
             RpcRestartGame();
 
-            startingPlayer = startingPlayer == player1 ? player2 : player1;
-            currentPlayer = startingPlayer;
-
             RpcStartCountdown();
         }
 
         [ClientRpc]
-        public void RpcRestartGame()
+        private void RpcRestartGame()
         {
-            /*foreach (CellGUI cellGUI in MatchCells.Values)
-                cellGUI.SetPlayer(null);*/
-
             exitButton.gameObject.SetActive(false);
             playAgainButton.gameObject.SetActive(false);
         }

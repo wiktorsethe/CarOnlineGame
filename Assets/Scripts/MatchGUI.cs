@@ -18,12 +18,7 @@ public class MatchGUI : MonoBehaviour
 
     public void Awake()
     {
-#if UNITY_2022_2_OR_NEWER
-            canvasController = GameObject.FindAnyObjectByType<CanvasController>();
-#else
-        // Deprecated in Unity 2023.1
         canvasController = GameObject.FindObjectOfType<CanvasController>();
-#endif
     }
 
     [ClientCallback]
