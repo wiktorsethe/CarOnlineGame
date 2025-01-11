@@ -323,12 +323,16 @@ public class CarController : NetworkBehaviour
 
     IEnumerator StopCarCoroutine()
     {
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(0.5f);
         
         if (rb != null)
         {
             rb.velocity = Vector2.zero;
             rb.angularVelocity = 0f;
         }
+        _accelerationInput = 0f;
+        _velocityVsUp = 0f;
+        _rotationAngle = 0f;
+        _steeringInput = 0f;
     }
 }

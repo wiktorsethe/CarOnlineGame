@@ -66,6 +66,13 @@ public class CanvasController : MonoBehaviour
         public GameObject roomView;
         public RoomGUI roomGUI;
         public ToggleGroup toggleGroup;
+        
+        private Vector3[] startingPositions = new Vector3[]
+        {
+            new Vector3(-4, 0, 0),  // Pozycja pierwszego gracza
+            new Vector3(4, 0, 0)   // Pozycja drugiego gracza
+        };
+
 
         // RuntimeInitializeOnLoadMethod -> fast playmode without domain reload
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -496,10 +503,20 @@ public class CanvasController : MonoBehaviour
                 {
                     playerConn.Send(new ClientMatchMessage { clientMatchOperation = ClientMatchOperation.Started });
 
-                    //TODO: SET PLAYER POSITIONS ON START OF MATCH
-                    
                     GameObject player = Instantiate(NetworkManager.singleton.playerPrefab);
                     player.GetComponent<NetworkMatch>().matchId = matchId;
+                    
+                    int playerInd = matchController.player1 == null ? 0 : 1; // Pierwszy gracz to 0, drugi to 1
+                    if (playerInd < startingPositions.Length)
+                    {
+                        player.transform.position = startingPositions[playerInd];
+                        player.transform.rotation = Quaternion.Euler(0,0,0);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Brak wystarczającej liczby pozycji startowych dla graczy.");
+                    }
+                    
                     NetworkServer.AddPlayerForConnection(playerConn, player);
 
                     if (matchController.player1 == null)

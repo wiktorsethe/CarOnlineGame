@@ -13,7 +13,6 @@ public class LineOfMeta : NetworkBehaviour
             // Wywołaj komendę na serwerze, aby wyłączyć skrypt wszystkim graczom
             matchController.CmdDisablePlayerCars();
             
-            //TODO: DODAC ODWOLANIE DO MATCHCONTROLLER ZEBY WYWOLYWAL GUZIKI POWROTU I RESTARTU 
             NetworkIdentity playerIdentity = collision.GetComponent<NetworkIdentity>();
             matchController.CmdShowWinner(playerIdentity);
         }

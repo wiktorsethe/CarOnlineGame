@@ -25,12 +25,15 @@ using UnityEngine.UI;
         [ReadOnly, SerializeField] internal NetworkIdentity player2;
         [ReadOnly, SerializeField] internal NetworkIdentity startingPlayer;
         
-        public Transform player1SpawnPoint; 
-        public Transform player2SpawnPoint;
-
         [SyncVar(hook = nameof(UpdateGameUI))]
         [ReadOnly, SerializeField] internal NetworkIdentity currentPlayer;
 
+        [Header("Player Starting Positions")]
+        public Vector3[] startingPositions = new Vector3[]
+        {
+            new Vector3(-4, 0, 0),  // Position for player 1
+            new Vector3(4, 0, 0)   // Position for player 2
+        };
         void Awake()
         {
 #if UNITY_2022_2_OR_NEWER
@@ -227,12 +230,7 @@ using UnityEngine.UI;
             /*foreach (CellGUI cellGUI in MatchCells.Values)
                 cellGUI.GetComponent<Button>().interactable = false;*/
 
-            if (winner == null)
-            {
-                gameText.text = "Draw!";
-                gameText.color = Color.yellow;
-            }
-            else if (winner.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
+            if (winner.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
                 gameText.text = "Winner!";
                 gameText.color = Color.blue;
@@ -285,10 +283,14 @@ using UnityEngine.UI;
                 matchPlayerData[identity] = mpd;
             }
 
+            RpcResetPlayerPositions();
+            
             RpcRestartGame();
 
             startingPlayer = startingPlayer == player1 ? player2 : player1;
             currentPlayer = startingPlayer;
+
+            RpcStartCountdown();
         }
 
         [ClientRpc]
@@ -299,6 +301,21 @@ using UnityEngine.UI;
 
             exitButton.gameObject.SetActive(false);
             playAgainButton.gameObject.SetActive(false);
+        }
+        
+        [ClientRpc]
+        private void RpcResetPlayerPositions()
+        {
+            int index = 0;
+            foreach (var player in matchPlayerData.Keys)
+            {
+                if (index < startingPositions.Length)
+                {
+                    player.transform.position = startingPositions[index];
+                    player.transform.rotation = Quaternion.Euler(0,0,0);
+                    index++;
+                }
+            }
         }
 
         // Assigned in inspector to BackButton::OnClick
