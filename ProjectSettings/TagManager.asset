@@ -9,6 +9,7 @@ TagManager:
   - OverpassTrigger
   - UnderpassTrigger
   - MetaLine
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
