@@ -149,6 +149,12 @@ using UnityEngine.UI;
             playAgainButton.gameObject.SetActive(true);
         }
 
+        public void ResetCarLapCounters()
+        {
+            CarLapCounter[] carLapCounters = FindObjectsOfType<CarLapCounter>();
+            foreach (CarLapCounter carLapCounter in carLapCounters) carLapCounter.Reset();
+        }
+
         // Assigned in inspector to ReplayButton::OnClick
         [ClientCallback]
         public void RequestPlayAgain()

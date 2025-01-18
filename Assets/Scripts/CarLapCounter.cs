@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Mirror;
 using UnityEngine;
 
 public class CarLapCounter : MonoBehaviour
@@ -14,13 +15,19 @@ public class CarLapCounter : MonoBehaviour
 
     private bool _isRaceCompleted = false;
     
-    int carPosition = 0;
+    int _carPosition = 0;
+    
+    [SerializeField] private MatchController matchController;
     
     public event Action<CarLapCounter> OnPassCheckpoint;
 
+    public void Awake()
+    {
+        matchController = FindObjectOfType<MatchController>();
+    }
     public void SetCarPosition(int position)
     {
-        carPosition = position;
+        _carPosition = position;
     }
 
     public int GetNumberOfCheckpointsPassed()
@@ -52,10 +59,26 @@ public class CarLapCounter : MonoBehaviour
                     _passedCheckpointNumber = 0;
                     _lapsCompleted++;
                     
-                    if(_lapsCompleted >= LAPS_TO_COMPLETE) _isRaceCompleted = true;
+                    if(_lapsCompleted >= LAPS_TO_COMPLETE)
+                    {
+                        _isRaceCompleted = true;
+                        matchController.CmdDisablePlayerCars();
+                        matchController.ResetCarLapCounters();
+                        matchController.CmdShowWinner(GetComponent<NetworkIdentity>());
+                    }
                 }
                 OnPassCheckpoint?.Invoke(this);
             }
         }
+    }
+
+    public void Reset()
+    {
+        _passedCheckpointNumber = 0;
+        _timeAtLastPassedCheckpoint = 0;
+        _numberOfPassedCheckpoints = 0;
+        _lapsCompleted = 0;
+        _isRaceCompleted = false;
+        _carPosition = 0;
     }
 }

@@ -20,6 +20,12 @@ public class PositionHandler : MonoBehaviour
 
     private void OnPassCheckpoint(CarLapCounter carLapCounter)
     {
-        carLapCounters = carLapCounters.OrderByDescending(s => s.GetNumberOfCheckpointsPassed()).ThenBy(s => s.GetNumberOfCheckpointsPassed()).ToList();
+        carLapCounters = carLapCounters.OrderByDescending(s => s.GetNumberOfCheckpointsPassed()).ThenBy(s => s.GetTimeAtLastPassedCheckpoint()).ToList();
+        
+        int carPosition = carLapCounters.IndexOf(carLapCounter) + 1;
+        
+        carLapCounter.SetCarPosition(carPosition);
+        
+        Debug.Log(carLapCounter.GetNumberOfCheckpointsPassed() + " checkpoints passed");
     }
 }
