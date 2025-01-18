@@ -91,7 +91,7 @@ MonoBehaviour:
   driftFactor: 0.95
   accelerationFactor: 30
   turnFactor: 3.5
-  maxSpeed: 20
+  maxSpeed: 30
   virtualCamera: {fileID: 0}
   trailRenderers:
   - {fileID: 6902814082345960493}
@@ -215,6 +215,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7b8f9dc7ab4c4c848757fbbba158e2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  matchController: {fileID: 0}
 --- !u!1 &1732870574290343438
 GameObject:
   m_ObjectHideFlags: 0
