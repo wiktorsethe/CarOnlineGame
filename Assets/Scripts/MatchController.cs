@@ -1,5 +1,7 @@
 ﻿using System.Collections;
+using DG.Tweening;
 using Mirror;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,9 +14,11 @@ using UnityEngine.UI;
 
         [Header("GUI References")]
         public CanvasGroup canvasGroup;
-        public Text gameText;
         public Button exitButton;
         public Button playAgainButton;
+        public TMP_Text lapCounterText;
+        public TMP_Text positionText;
+        public TMP_Text infoText;
 
         [Header("Diagnostics")]
         [ReadOnly, SerializeField] internal CanvasController canvasController;
@@ -59,6 +63,9 @@ using UnityEngine.UI;
 
         public override void OnStartClient()
         {
+            lapCounterText.text = "Laps: 0";
+            positionText.text = "";
+            
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
             canvasGroup.blocksRaycasts = true;
@@ -75,24 +82,24 @@ using UnityEngine.UI;
         
         private IEnumerator StartCountdown()
         {
-            gameText.text = "3";
-            gameText.color = Color.white;
+            infoText.text = "3";
+            infoText.color = Color.white;
             yield return new WaitForSeconds(1f);
 
-            gameText.text = "2";
+            infoText.text = "2";
             yield return new WaitForSeconds(1f);
 
-            gameText.text = "1";
+            infoText.text = "1";
             yield return new WaitForSeconds(1f);
 
-            gameText.text = "Start!";
-            gameText.color = Color.green;
+            infoText.text = "Start!";
+            infoText.color = Color.green;
             
             CmdEnablePlayerCars();
 
             yield return new WaitForSeconds(1f);
 
-            gameText.text = ""; // Ukryj tekst po odliczaniu
+            infoText.text = ""; // Ukryj tekst po odliczaniu
         }
         
         [Command(requiresAuthority = false)]
@@ -136,13 +143,13 @@ using UnityEngine.UI;
         {
             if (winner.gameObject.GetComponent<NetworkIdentity>().isLocalPlayer)
             {
-                gameText.text = "Winner!";
-                gameText.color = Color.blue;
+                infoText.text = "Winner!";
+                infoText.color = Color.blue;
             }
             else
             {
-                gameText.text = "Loser!";
-                gameText.color = Color.red;
+                infoText.text = "Loser!";
+                infoText.color = Color.red;
             }
 
             exitButton.gameObject.SetActive(true);
@@ -278,7 +285,7 @@ using UnityEngine.UI;
 
             // Send latest match list
             canvasController.SendMatchList();
-
+            
             NetworkServer.Destroy(gameObject);
         }
 
@@ -286,5 +293,6 @@ using UnityEngine.UI;
         public void RpcExitGame()
         {
             canvasController.OnMatchEnded();
+            canvasController.minimap.SetActive(false);
         }
     }

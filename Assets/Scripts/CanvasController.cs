@@ -66,6 +66,7 @@ public class CanvasController : MonoBehaviour
         public GameObject roomView;
         public RoomGUI roomGUI;
         public ToggleGroup toggleGroup;
+        public GameObject minimap; 
         
         private Vector3[] startingPositions = new Vector3[]
         {
@@ -615,6 +616,7 @@ public class CanvasController : MonoBehaviour
                     }
                 case ClientMatchOperation.Started:
                     {
+                        minimap.SetActive(true);
                         lobbyView.SetActive(false);
                         roomView.SetActive(false);
                         break;
