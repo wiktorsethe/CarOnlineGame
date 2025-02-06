@@ -15,6 +15,12 @@ using Mirror;
         /// </summary>
         public override void Awake()
         {
+            if (SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null) 
+            {
+                // Automatyczny start serwera w trybie headless
+                StartServer();
+            }
+            
             base.Awake();
             canvasController.InitializeData();
         }

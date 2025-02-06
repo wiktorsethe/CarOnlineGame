@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
 
@@ -10,7 +8,6 @@ public class CarLapCounter : NetworkBehaviour
     private float _timeAtLastPassedCheckpoint = 0;
     private int _numberOfPassedCheckpoints = 0;
 
-    [SyncVar]
     private int _lapsCompleted = 0;
     private const int LAPS_TO_COMPLETE = 2;
 
@@ -21,13 +18,11 @@ public class CarLapCounter : NetworkBehaviour
     [SerializeField] private MatchController matchController;
     
     public event Action<CarLapCounter> OnPassCheckpoint;
-    public event Action<int> OnLapsUpdated; // Event do aktualizacji UI
 
     public void Awake()
     {
         matchController = FindObjectOfType<MatchController>();
     }
-    
     public void SetCarPosition(int position)
     {
         _carPosition = position;
@@ -60,34 +55,34 @@ public class CarLapCounter : NetworkBehaviour
                 if (checkpoint.isFinishLine)
                 {
                     _passedCheckpointNumber = 0;
+                    
                     CmdIncreaseLap();
+                    
+                    if(_lapsCompleted >= LAPS_TO_COMPLETE)
+                    {
+                        _isRaceCompleted = true;
+                        matchController.CmdDisablePlayerCars();
+                        matchController.ResetCarLapCounters();
+                        matchController.CmdShowWinner(GetComponent<NetworkIdentity>());
+                    }
                 }
                 OnPassCheckpoint?.Invoke(this);
             }
         }
     }
-
+    
     [Command]
     private void CmdIncreaseLap()
     {
         _lapsCompleted++;
-        RpcUpdateLaps(_lapsCompleted);
-
-        if(_lapsCompleted >= LAPS_TO_COMPLETE)
-        {
-            _isRaceCompleted = true;
-            matchController.CmdDisablePlayerCars();
-            matchController.ResetCarLapCounters();
-            matchController.CmdShowWinner(GetComponent<NetworkIdentity>());
-        }
+        TargetUpdateLaps(connectionToClient, _lapsCompleted);
     }
     
-    [ClientRpc]
-    private void RpcUpdateLaps(int newLaps)
+    [TargetRpc]
+    private void TargetUpdateLaps(NetworkConnection target, int newLaps)
     {
         _lapsCompleted = newLaps;
-        matchController.lapCounterText.text = "Laps: " + _lapsCompleted.ToString();
-        OnLapsUpdated?.Invoke(_lapsCompleted);
+        matchController.lapCounterText.text = "Laps: " + _lapsCompleted;  
     }
 
     public void Reset()
