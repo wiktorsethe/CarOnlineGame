@@ -1,6 +1,6 @@
 using System;
-using Mirror;
 using UnityEngine;
+using Mirror;
 
 public class CarLapCounter : NetworkBehaviour
 {
@@ -17,15 +17,33 @@ public class CarLapCounter : NetworkBehaviour
     
     [SerializeField] private MatchController matchController;
     
+    private NetworkConnection _ownerConnection;
     public event Action<CarLapCounter> OnPassCheckpoint;
 
+    public override void OnStartServer()
+    {
+        base.OnStartServer();
+        // Zapisujemy połączenie właściciela; zakładamy, że każdy samochód jest player-owned
+        _ownerConnection = connectionToClient;
+    }
+    
     public void Awake()
     {
         matchController = FindObjectOfType<MatchController>();
     }
-    public void SetCarPosition(int position)
+    
+    [Command(requiresAuthority = false)]
+    public void CmdSetCarPosition(int position)
     {
         _carPosition = position;
+        TargetUpdatePosition(_ownerConnection, _carPosition);
+
+    }
+    
+    [TargetRpc]
+    private void TargetUpdatePosition(NetworkConnection target, int newPosition)
+    {
+        matchController.positionText.text = "Pos: " + newPosition;  
     }
 
     public int GetNumberOfCheckpointsPassed()
@@ -82,7 +100,7 @@ public class CarLapCounter : NetworkBehaviour
     private void TargetUpdateLaps(NetworkConnection target, int newLaps)
     {
         _lapsCompleted = newLaps;
-        matchController.lapCounterText.text = "Laps: " + _lapsCompleted;  
+        matchController.lapCounterText.text = "Laps: " + (_lapsCompleted+1);  
     }
 
     public void Reset()

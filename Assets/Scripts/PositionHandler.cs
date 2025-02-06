@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -24,7 +22,7 @@ public class PositionHandler : MonoBehaviour
         
         int carPosition = carLapCounters.IndexOf(carLapCounter) + 1;
         
-        carLapCounter.SetCarPosition(carPosition);
+        carLapCounter.CmdSetCarPosition(carPosition);
         
         Debug.Log(carLapCounter.GetNumberOfCheckpointsPassed() + " checkpoints passed");
     }

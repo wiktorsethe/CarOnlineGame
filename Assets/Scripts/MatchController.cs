@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using DG.Tweening;
 using Mirror;
 using TMPro;
 using UnityEngine;
@@ -63,8 +62,8 @@ using UnityEngine.UI;
 
         public override void OnStartClient()
         {
-            lapCounterText.text = "Laps: 0";
-            positionText.text = "";
+            lapCounterText.text = "Laps: 1";
+            positionText.text = "Pos: 1";
             
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
