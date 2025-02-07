@@ -6,4 +6,5 @@ public class Checkpoint : MonoBehaviour
 {
     public bool isFinishLine = false;
     public int checkPointNumber;
+    public Transform restartPosition;
 }
