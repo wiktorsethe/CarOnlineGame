@@ -5,6 +5,7 @@ using Cinemachine;
 
 public class CarController : NetworkBehaviour
 {
+    #region CarSettings
     [Header("Car Settings")]
     [Tooltip("Coefficient of drift applied to lateral velocity")]
     public float driftFactor = 0.95f;
@@ -14,21 +15,16 @@ public class CarController : NetworkBehaviour
     public float turnFactor = 3.5f;
     [Tooltip("Maximum car speed")]
     public float maxSpeed = 20.0f;
-
+    #endregion
+    
+    #region Variables
     private float _accelerationInput = 0f;
     private float _steeringInput = 0f;
     private float _rotationAngle = 0f;
     private float _velocityVsUp = 0f; // Velocity component in the direction of the car's front
-
-    private Rigidbody2D rb;
-
-    public CinemachineVirtualCamera virtualCamera;
-
-    public TrailRenderer[] trailRenderers;
-    public TrailRenderer[] overpassTrailRenderers;
-
-    public ParticleSystem[] particleSystems;
-
+    #endregion
+    
+    #region Network Variables
     // Store whether the tires are screeching
     [SyncVar]
     public bool isTireScreeching;
@@ -40,37 +36,25 @@ public class CarController : NetworkBehaviour
     // Store whether the player is on overpass
     [SyncVar]
     public bool isOverpassEmitter = false;
-
+    #endregion
+    
+    #region Properties
+    public CinemachineVirtualCamera virtualCamera;
+    public TrailRenderer[] trailRenderers;
+    public TrailRenderer[] overpassTrailRenderers;
+    public ParticleSystem[] particleSystems;
+    
+    private Rigidbody2D _rb;
     private CarLayerHandler _carLayerHandler;
+    #endregion
+    
+    #region Unity Callbacks
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        _rb = GetComponent<Rigidbody2D>();
         virtualCamera = FindObjectOfType<CinemachineVirtualCamera>();
         _carLayerHandler = GetComponent<CarLayerHandler>();
-    }
-
-    public override void OnStartLocalPlayer()
-    {
-        // Assign the virtual camera to follow the local player's car
-        if (virtualCamera != null)
-        {
-            virtualCamera.Follow = transform;
-        }
-
-        SetTrailRenderers(false);
-        isTireScreeching = false;
-        CmdSetTireScreeching(false);
-
-        foreach (var particle in particleSystems)
-        {
-            if (particle != null)
-            {
-                var particleEmission = particle.emission;
-                particleEmission.enabled = true;
-                particleEmission.rateOverTime = 0;
-            }
-        }
     }
 
     private void FixedUpdate()
@@ -94,7 +78,122 @@ public class CarController : NetworkBehaviour
         // Check if the car is driving on an overpass and update trail renderers accordingly
         UpdateOverpassState();
     }
+    #endregion
+    
+    #region Networking
+    public override void OnStartLocalPlayer()
+    {
+        // Assign the virtual camera to follow the local player's car
+        if (virtualCamera != null)
+        {
+            virtualCamera.Follow = transform;
+        }
 
+        SetTrailRenderers(false);
+        isTireScreeching = false;
+        CmdSetTireScreeching(false);
+
+        foreach (var particle in particleSystems)
+        {
+            if (particle != null)
+            {
+                var particleEmission = particle.emission;
+                particleEmission.enabled = true;
+                particleEmission.rateOverTime = 0;
+            }
+        }
+    }
+    
+    [Command]
+    private void CmdSetTireScreeching(bool screeching)
+    {
+        // Update the state on the server
+        isTireScreeching = screeching;
+
+        // Notify all clients about the change
+        RpcSetTireScreeching(screeching);
+    }
+
+    [ClientRpc]
+    private void RpcSetTireScreeching(bool screeching)
+    {
+        // Update the trail renderers for all clients
+        SetTrailRenderers(screeching);
+    }
+
+    [Command]
+    private void CmdSetOverpassEmitter(bool overpassEmitter)
+    {
+        // Propagate overpass emitter state to all clients
+        isOverpassEmitter = overpassEmitter;
+        RpcSetOverpassEmitter(overpassEmitter);
+    }
+
+    [ClientRpc]
+    private void RpcSetOverpassEmitter(bool overpassEmitter)
+    {
+        // Update trail renderers based on overpass state and tire screeching
+        isOverpassEmitter = overpassEmitter;
+        SetTrailRenderers(isTireScreeching);
+    }
+    
+    [Command]
+    private void CmdUpdateParticleEmissionRate(float rate)
+    {
+        // Update the state on the server
+        particleEmissionRate = rate;
+        
+        // Notify all clients about the change
+        RpcUpdateParticleEmissionRate(rate);
+    }
+
+    [ClientRpc]
+    private void RpcUpdateParticleEmissionRate(float rate)
+    {
+        // Update the particle systems for all clients  
+        foreach (var particle in particleSystems)
+        {
+            if (particle != null)
+            {
+                var particleEmission = particle.emission;
+                particleEmission.enabled = true;
+                particleEmission.rateOverTime = rate;
+            }
+        }
+    }
+    
+    [Command(requiresAuthority = false)]
+    private void CmdStopAllParticlesAndTrailRenderers()
+    {
+        RpcStopAllParticlesAndTrailRenderers();
+    }
+
+    [ClientRpc]
+    private void RpcStopAllParticlesAndTrailRenderers()
+    {
+        
+        foreach (var trail in trailRenderers)
+        {
+            trail.emitting = false;
+            trail.Clear();
+        }
+
+        foreach (var trail in overpassTrailRenderers)
+        {
+            trail.emitting = false;
+            trail.Clear();
+        }
+
+        foreach (var particle in particleSystems)
+        {
+            var particleEmission = particle.emission;
+            particleEmission.enabled = false;
+            particle.Clear();
+        }
+    }
+    #endregion
+
+    #region Methods
     private void UpdateOverpassState()
     {
         if (_carLayerHandler != null)
@@ -130,39 +229,6 @@ public class CarController : NetworkBehaviour
                 CmdSetTireScreeching(false);
             }
         }
-    }
-
-    [Command]
-    private void CmdSetTireScreeching(bool screeching)
-    {
-        // Update the state on the server
-        isTireScreeching = screeching;
-
-        // Notify all clients about the change
-        RpcSetTireScreeching(screeching);
-    }
-
-    [ClientRpc]
-    private void RpcSetTireScreeching(bool screeching)
-    {
-        // Update the trail renderers for all clients
-        SetTrailRenderers(screeching);
-    }
-
-    [Command]
-    private void CmdSetOverpassEmitter(bool overpassEmitter)
-    {
-        // Propagate overpass emitter state to all clients
-        isOverpassEmitter = overpassEmitter;
-        RpcSetOverpassEmitter(overpassEmitter);
-    }
-
-    [ClientRpc]
-    private void RpcSetOverpassEmitter(bool overpassEmitter)
-    {
-        // Update trail renderers based on overpass state and tire screeching
-        isOverpassEmitter = overpassEmitter;
-        SetTrailRenderers(isTireScreeching);
     }
 
     private void SetTrailRenderers(bool screeching)
@@ -213,36 +279,13 @@ public class CarController : NetworkBehaviour
         CmdUpdateParticleEmissionRate(particleEmissionRate); // TU COS JEST NIE TAK
     }
 
-    [Command]
-    private void CmdUpdateParticleEmissionRate(float rate)
-    {
-        // Update the state on the server
-        particleEmissionRate = rate;
-        
-        // Notify all clients about the change
-        RpcUpdateParticleEmissionRate(rate);
-    }
-
-    [ClientRpc]
-    private void RpcUpdateParticleEmissionRate(float rate)
-    {
-        // Update the particle systems for all clients  
-        foreach (var particle in particleSystems)
-        {
-            if (particle != null)
-            {
-                var particleEmission = particle.emission;
-                particleEmission.enabled = true;
-                particleEmission.rateOverTime = rate;
-            }
-        }
-    }
+    
 
     // Method to apply engine force based on player input
     private void ApplyEngineForce()
     {
         // Calculate the car's velocity relative to its forward direction
-        _velocityVsUp = Vector2.Dot(transform.up, rb.velocity);
+        _velocityVsUp = Vector2.Dot(transform.up, _rb.velocity);
 
         // Prevent further acceleration if the car is already at its max speed
         if (_velocityVsUp > maxSpeed && _accelerationInput > 0f) return;
@@ -251,53 +294,53 @@ public class CarController : NetworkBehaviour
         if (_velocityVsUp < -maxSpeed * 0.5f && _accelerationInput < 0f) return;
 
         // Limit the car's speed in any direction
-        if (rb.velocity.sqrMagnitude > maxSpeed * maxSpeed && _accelerationInput > 0f) return;
+        if (_rb.velocity.sqrMagnitude > maxSpeed * maxSpeed && _accelerationInput > 0f) return;
 
         // Apply drag when no acceleration is input
         if (_accelerationInput == 0f)
         {
-            rb.drag = Mathf.Lerp(rb.drag, 3.0f, Time.fixedDeltaTime * 3);
+            _rb.drag = Mathf.Lerp(_rb.drag, 3.0f, Time.fixedDeltaTime * 3);
         }
         else
         {
-            rb.drag = 0f;
+            _rb.drag = 0f;
         }
 
         // Apply the engine force in the forward direction
         Vector2 engineForceVector = transform.up * _accelerationInput * accelerationFactor;
-        rb.AddForce(engineForceVector, ForceMode2D.Force);
+        _rb.AddForce(engineForceVector, ForceMode2D.Force);
     }
 
     // Method to apply steering based on player input
     private void ApplySteering()
     {
         // Adjust the steering sensitivity based on the car's speed
-        float minSpeedBeforeAllowTurningFactor = (rb.velocity.magnitude / 8);
+        float minSpeedBeforeAllowTurningFactor = (_rb.velocity.magnitude / 8);
         minSpeedBeforeAllowTurningFactor = Mathf.Clamp01(minSpeedBeforeAllowTurningFactor);
 
         // Rotate the car based on the steering input and speed
         _rotationAngle -= _steeringInput * turnFactor * minSpeedBeforeAllowTurningFactor;
-        rb.MoveRotation(_rotationAngle);
+        _rb.MoveRotation(_rotationAngle);
     }
 
     // Method to reduce the car's lateral velocity (simulate drifting)
     private void KillOrthogonalVelocity()
     {
-        Vector2 forwardVelocity = transform.up * Vector2.Dot(rb.velocity, transform.up);
-        Vector2 rightVelocity = transform.right * Vector2.Dot(rb.velocity, transform.right);
+        Vector2 forwardVelocity = transform.up * Vector2.Dot(_rb.velocity, transform.up);
+        Vector2 rightVelocity = transform.right * Vector2.Dot(_rb.velocity, transform.right);
 
         // Apply drift factor to the lateral velocity
-        rb.velocity = forwardVelocity + rightVelocity * driftFactor;
+        _rb.velocity = forwardVelocity + rightVelocity * driftFactor;
     }
 
     // Helper method to get the lateral velocity of the car
     private float GetLateralVelocity()
     {
-        return Vector2.Dot(transform.right, rb.velocity);
+        return Vector2.Dot(transform.right, _rb.velocity);
     }
 
     // Method to check if the tires are screeching (e.g., during drifting or braking)
-    public bool IsTireScreeching(out float lateralVelocity, out bool isBraking)
+    private bool IsTireScreeching(out float lateralVelocity, out bool isBraking)
     {
         lateralVelocity = GetLateralVelocity();
         isBraking = false;
@@ -327,10 +370,10 @@ public class CarController : NetworkBehaviour
     {
         yield return new WaitForSeconds(0.5f);
         
-        if (rb != null)
+        if (_rb != null)
         {
-            rb.velocity = Vector2.zero;
-            rb.angularVelocity = 0f;
+            _rb.velocity = Vector2.zero;
+            _rb.angularVelocity = 0f;
         }
         _accelerationInput = 0f;
         _velocityVsUp = 0f;
@@ -339,34 +382,5 @@ public class CarController : NetworkBehaviour
         
         CmdStopAllParticlesAndTrailRenderers();
     }
-
-    [Command(requiresAuthority = false)]
-    private void CmdStopAllParticlesAndTrailRenderers()
-    {
-        RpcStopAllParticlesAndTrailRenderers();
-    }
-
-    [ClientRpc]
-    private void RpcStopAllParticlesAndTrailRenderers()
-    {
-        
-        foreach (var trail in trailRenderers)
-        {
-            trail.emitting = false;
-            trail.Clear();
-        }
-
-        foreach (var trail in overpassTrailRenderers)
-        {
-            trail.emitting = false;
-            trail.Clear();
-        }
-
-        foreach (var particle in particleSystems)
-        {
-            var particleEmission = particle.emission;
-            particleEmission.enabled = false;
-            particle.Clear();
-        }
-    }
+    #endregion
 }

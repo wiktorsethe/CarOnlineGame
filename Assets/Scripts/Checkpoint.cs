@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Checkpoint : MonoBehaviour
 {
-    public bool isFinishLine = false;
+    public bool isFinishLine;
     public int checkPointNumber;
-    public Transform restartPosition;
+    public Transform restartTransform;
 }

@@ -4,20 +4,25 @@ using UnityEngine;
 
 public class CarLayerHandler : NetworkBehaviour
 {
-    public SpriteRenderer carOutline;
-    
+    #region Variables
     // Reference to rendering layers
     public string sortingLayerAboveOverpass = "RacetrackOverpass";
     public string sortingLayerBelowOverpass = "Default";
-
+    #endregion
+    
+    #region Properties
+    public SpriteRenderer carOutline;
+    private Collider2D _carCollider;
     private List<Collider2D> _overpassColliderList = new List<Collider2D>();
     private List<Collider2D> _underpassColliderList = new List<Collider2D>();
-
+    #endregion
+    
+    #region Network Variables
     [SyncVar(hook = nameof(OnDrivingOnOverpassChanged))]
     private bool _isDrivingOnOverpass = false; // Initially set to false, as the player starts below the bridge
+    #endregion
 
-    private Collider2D _carCollider;
-
+    #region Unity Callbacks
     private void Awake()
     {
         // Find all colliders for overpasses
@@ -55,7 +60,9 @@ public class CarLayerHandler : NetworkBehaviour
             CmdChangeSortingLayerAndCollision(false, sortingLayerBelowOverpass, true);
         }
     }
+    #endregion
 
+    #region Networking
     // Command to change rendering layer and collision (executed on the server)
     [Command]
     void CmdChangeSortingLayerAndCollision(bool isDrivingOnOverpass, string newSortingLayer, bool isOutlineEnabled)
@@ -83,20 +90,22 @@ public class CarLayerHandler : NetworkBehaviour
     {
         SetCollisionOverpass(isDrivingOnOverpass);
     }
-
+    #endregion
+    
+    #region Methods
     // Adjust collisions depending on whether the player is on or under the overpass
     private void SetCollisionOverpass(bool isDrivingOnOverpass)
     {
-        foreach (Collider2D collider in _overpassColliderList)
+        foreach (Collider2D col in _overpassColliderList)
         {
             // Ignore collisions with the overpass if not on the overpass
-            Physics2D.IgnoreCollision(_carCollider, collider, !isDrivingOnOverpass);
+            Physics2D.IgnoreCollision(_carCollider, col, !isDrivingOnOverpass);
         }
 
-        foreach (Collider2D collider in _underpassColliderList)
+        foreach (Collider2D col in _underpassColliderList)
         {
             // Enable collisions with the lower overpass only when on the overpass
-            Physics2D.IgnoreCollision(_carCollider, collider, isDrivingOnOverpass);
+            Physics2D.IgnoreCollision(_carCollider, col, isDrivingOnOverpass);
         }
     }
 
@@ -110,4 +119,5 @@ public class CarLayerHandler : NetworkBehaviour
     {
         return _isDrivingOnOverpass;
     }
+    #endregion
 }

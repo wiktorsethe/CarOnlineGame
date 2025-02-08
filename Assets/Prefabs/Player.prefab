@@ -93,6 +93,9 @@ MonoBehaviour:
   accelerationFactor: 30
   turnFactor: 3.5
   maxSpeed: 30
+  isTireScreeching: 0
+  particleEmissionRate: 0
+  isOverpassEmitter: 0
   virtualCamera: {fileID: 0}
   trailRenderers:
   - {fileID: 6902814082345960493}
@@ -103,9 +106,6 @@ MonoBehaviour:
   particleSystems:
   - {fileID: 6578616093533657548}
   - {fileID: 6978020386997403488}
-  isTireScreeching: 0
-  particleEmissionRate: 0
-  isOverpassEmitter: 0
 --- !u!50 &7667013174753254231
 Rigidbody2D:
   serializedVersion: 4
@@ -175,9 +175,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  carOutline: {fileID: 8316502727006763360}
   sortingLayerAboveOverpass: RacetrackOverpass
   sortingLayerBelowOverpass: Default
+  carOutline: {fileID: 8316502727006763360}
 --- !u!61 &5749182464121680681
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -216,6 +216,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7b8f9dc7ab4c4c848757fbbba158e2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
   matchController: {fileID: 0}
 --- !u!1 &1732870574290343438
 GameObject:
@@ -5234,7 +5237,7 @@ TrailRenderer:
   m_Time: 50
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.2
+    widthMultiplier: 0.5
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -5399,7 +5402,7 @@ TrailRenderer:
   m_Time: 50
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.2
+    widthMultiplier: 0.5
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -5739,7 +5742,7 @@ TrailRenderer:
   m_Time: 50
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.2
+    widthMultiplier: 0.5
     widthCurve:
       serializedVersion: 2
       m_Curve:
@@ -5904,7 +5907,7 @@ TrailRenderer:
   m_Time: 50
   m_Parameters:
     serializedVersion: 3
-    widthMultiplier: 0.2
+    widthMultiplier: 0.5
     widthCurve:
       serializedVersion: 2
       m_Curve:
